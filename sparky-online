@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Created by pavroo <pavroo@onet.eu> Feb 13, 2019 under GNU GPL 3 
+# Dependencies: bash, coreutils, cron, iputils-ping, wget, yad
+# copy sparky-online to /usr/bin/
+# then: sudo chmod +x /usr/bin/sparky-online
+
+### paste a web site you want to check: ###
+WEB="https://yoursite.com"
+
+PINGTEST=`ping -c 1 google.com | grep [0-9]`
+if [ "$PINGTEST" = "" ]; then
+	yad --title="Server Check Out" --text="\nPing failed!\n\nAre you connected to the internet?" --width=400 --height=200 --button=Exit:0 --image=process-stop --window-icon=process-stop --on-top
+	exit 1
+fi
+
+LASTTIME=`date '+%a %F %T'`
+wget --spider --quiet --tries=1 $WEB >> /dev/null
+
+### display a message 1 if your web site is down ###
+if [ "$?" != 0 ]; then
+	yad --title="Server Check Out" --text="\nWebsite $WEB failed!\n\nLast check: $LASTTIME" --width=400 --height=200 --button=Exit:0 --image=process-stop --window-icon=process-stop --on-top
+### end of message 1 ###
+
+### display a message 2 if your web site is online; can be disabled ###
+else
+	yad --title="Server Check Out" --text="\nWebsite $WEB is online!\n\nLast check: $LASTTIME" --width=400 --height=200 --button=Exit:0 --image=dialog-ok --window-icon=dialog-ok --on-top
+### end of message 2 ###
+
+fi
+
+exit 0
